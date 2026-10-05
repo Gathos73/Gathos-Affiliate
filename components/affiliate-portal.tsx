@@ -35,7 +35,24 @@ function Login({ onLogin }: { onLogin: (value?: Affiliate) => void }) {
       {mode === "register" && step === "details" && <form onSubmit={startRegistration}><label>Your name<input autoFocus required maxLength={200} value={name} onChange={e => setName(e.target.value)} /></label><label>Email address<input required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} /></label><button className="primary" disabled={busy}>{busy ? "Sending code…" : "Verify email"}</button></form>}
       {mode === "register" && step === "verify" && <form onSubmit={verifyRegistration}><p className="muted">Enter the six-digit code sent to {email}.</p><label>Verification code<input autoFocus required inputMode="numeric" maxLength={6} pattern="[0-9]{6}" value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ""))} /></label><button className="primary" disabled={busy || code.length !== 6}>{busy ? "Verifying…" : "Verify code"}</button><button type="button" className="text-button" onClick={() => setStep("details")}>Change details</button></form>}
       {mode === "register" && step === "password" && <form onSubmit={register}><p className="muted">Email verified. Create a password with at least eight characters.</p><label>Password<input autoFocus required minLength={8} type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} /></label><button className="primary" disabled={busy}>{busy ? "Creating account…" : "Create account"}</button></form>}
-      <div className="login-divider"><span>or</span></div><a className="social-button" href={`/affiliates/api/affiliate/session/social?return_to=${socialReturn}`}>Login with Social</a>
+      <div className="login-divider"><span>or</span></div>
+      <a className="workos-button" href={`/api/affiliate/session/social?return_to=${socialReturn}`}>
+        <span className="social-provider-icons" aria-hidden="true">
+          <svg className="social-provider-icon" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.3c1.9-1.8 2.9-4.4 2.9-7.4Z" />
+            <path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.3-2.5c-.9.6-2.1 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3v2.6A10 10 0 0 0 12 22Z" />
+            <path fill="#FBBC05" d="M6.4 14a6 6 0 0 1 0-3.9V7.5H3a10 10 0 0 0 0 9.1L6.4 14Z" />
+            <path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9.8 9.8 0 0 0 3 7.5l3.4 2.6A6 6 0 0 1 12 5.9Z" />
+          </svg>
+          <svg className="social-provider-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M17.1 12.6c0-2.8 2.3-4.2 2.4-4.3A5.2 5.2 0 0 0 15.4 6c-1.8-.2-3.4 1-4.3 1s-2.2-1-3.7-1A5.5 5.5 0 0 0 2.8 8.8c-2 3.4-.5 8.4 1.4 11.2.9 1.4 2 2.9 3.5 2.8 1.4-.1 1.9-.9 3.6-.9s2.2.9 3.7.9c1.5 0 2.5-1.4 3.4-2.7a12.2 12.2 0 0 0 1.6-3.3 4.9 4.9 0 0 1-2.9-4.2ZM14.2 4.1A4.9 4.9 0 0 0 15.3.5a5 5 0 0 0-3.3 1.7 4.7 4.7 0 0 0-1.2 3.5 4.1 4.1 0 0 0 3.4-1.6Z" />
+          </svg>
+          <svg className="social-provider-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 .7A11.5 11.5 0 0 0 8.4 23c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.3 11.3 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .7Z" />
+          </svg>
+        </span>
+        Login with Social
+      </a>
     </div></section><aside className="login-art"><p>PARTNER NETWORK</p><h2>Your audience.<br/><em>Shared momentum.</em></h2><div className="art-stat"><strong>One account</strong><span>shared securely across Gathos dashboards</span></div></aside></main>;
 }
 
