@@ -14,21 +14,29 @@ const NAV: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
 const money = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 const date = (value: string) => new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(new Date(value));
 
-function Login({ onLogin }: { onLogin: (value: Affiliate) => void }) {
-  const [step, setStep] = useState<"email" | "code">("email"); const [email, setEmail] = useState("");
-  const [code, setCode] = useState(""); const [name, setName] = useState(""); const [error, setError] = useState(""); const [busy, setBusy] = useState(false);
-  async function submit(event: FormEvent) {
-    event.preventDefault(); setBusy(true); setError("");
-    try {
-      if (step === "email") { await api("/auth/send-otp", json({ email })); setStep("code"); }
-      else { const result = await api<{ affiliate: Affiliate }>("/auth/verify-otp", json({ email, code, name })); onLogin(result.affiliate); }
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not sign in."); } finally { setBusy(false); }
-  }
+function Login({ onLogin }: { onLogin: (value?: Affiliate) => void }) {
+  const [mode, setMode] = useState<"signin" | "register">("signin");
+  const [step, setStep] = useState<"details" | "verify" | "password">("details");
+  const [email, setEmail] = useState(""); const [name, setName] = useState("");
+  const [password, setPassword] = useState(""); const [code, setCode] = useState("");
+  const [error, setError] = useState(""); const [busy, setBusy] = useState(false);
+  const request = async (path: string, body: unknown) => api(path, json(body));
+  async function signIn(event: FormEvent) { event.preventDefault(); setBusy(true); setError(""); try { await request("/session/login", { email: email.trim(), password }); onLogin(); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not sign in."); } finally { setBusy(false); } }
+  async function startRegistration(event: FormEvent) { event.preventDefault(); setBusy(true); setError(""); try { await request("/session/send", { email: email.trim(), name: name.trim(), purpose: "verify" }); setStep("verify"); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not send the verification code."); } finally { setBusy(false); } }
+  async function verifyRegistration(event: FormEvent) { event.preventDefault(); setBusy(true); setError(""); try { await request("/session/verify", { email: email.trim(), code, purpose: "verify" }); setStep("password"); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not verify the code."); } finally { setBusy(false); } }
+  async function register(event: FormEvent) { event.preventDefault(); setBusy(true); setError(""); try { await request("/session/register", { email: email.trim(), name: name.trim(), password }); onLogin(); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not create your account."); } finally { setBusy(false); } }
+  const switchMode = (next: "signin" | "register") => { setMode(next); setStep("details"); setPassword(""); setCode(""); setError(""); };
+  const socialReturn = encodeURIComponent(process.env.NEXT_PUBLIC_AFFILIATE_URL || "https://affiliate.gathos.live");
   return <main className="login-page"><section className="login-panel"><div className="brand"><span>G</span><div><strong>Gathos</strong><small>Affiliate programme</small></div></div>
-    <div className="login-card"><p className="eyebrow">Partner access</p><h1>{step === "email" ? "Grow with Gathos." : "Check your inbox."}</h1><p className="muted">{step === "email" ? "Sign in or create your affiliate account with a one-time code." : `We sent a six-digit code to ${email}.`}</p>
-      <form onSubmit={submit}>{step === "email" ? <label>Email address<input autoFocus required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /></label> : <><label>Your name <span>(first sign-in only)</span><input value={name} onChange={e => setName(e.target.value)} placeholder="Full name" /></label><label>Verification code<input autoFocus required inputMode="numeric" maxLength={6} pattern="[0-9]{6}" value={code} onChange={e => setCode(e.target.value)} placeholder="000000" /></label></>}
-        {error && <p className="error">{error}</p>}<button className="primary" disabled={busy}>{busy ? "Please wait…" : step === "email" ? "Send sign-in code" : "Open dashboard"}</button>{step === "code" && <button type="button" className="text-button" onClick={() => setStep("email")}>Use another email</button>}</form>
-    </div></section><aside className="login-art"><p>PARTNER NETWORK</p><h2>Your audience.<br/><em>Shared momentum.</em></h2><div className="art-stat"><strong>30 days</strong><span>first-touch attribution window</span></div></aside></main>;
+    <div className="login-card"><p className="eyebrow">Partner access</p><h1>Access your dashboard.</h1><p className="muted">Use the same account and secure session as your Gathos dashboard.</p>
+      {step === "details" && <div className="login-tabs"><button className={mode === "signin" ? "active" : ""} onClick={() => switchMode("signin")}>Sign in</button><button className={mode === "register" ? "active" : ""} onClick={() => switchMode("register")}>Create account</button></div>}
+      {error && <p className="error">{error}</p>}
+      {mode === "signin" && <form onSubmit={signIn}><label>Email address<input autoFocus required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /></label><label>Password<input required type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} /></label><button className="primary" disabled={busy}>{busy ? "Signing in…" : "Sign in with email"}</button></form>}
+      {mode === "register" && step === "details" && <form onSubmit={startRegistration}><label>Your name<input autoFocus required maxLength={200} value={name} onChange={e => setName(e.target.value)} /></label><label>Email address<input required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} /></label><button className="primary" disabled={busy}>{busy ? "Sending code…" : "Verify email"}</button></form>}
+      {mode === "register" && step === "verify" && <form onSubmit={verifyRegistration}><p className="muted">Enter the six-digit code sent to {email}.</p><label>Verification code<input autoFocus required inputMode="numeric" maxLength={6} pattern="[0-9]{6}" value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ""))} /></label><button className="primary" disabled={busy || code.length !== 6}>{busy ? "Verifying…" : "Verify code"}</button><button type="button" className="text-button" onClick={() => setStep("details")}>Change details</button></form>}
+      {mode === "register" && step === "password" && <form onSubmit={register}><p className="muted">Email verified. Create a password with at least eight characters.</p><label>Password<input autoFocus required minLength={8} type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} /></label><button className="primary" disabled={busy}>{busy ? "Creating account…" : "Create account"}</button></form>}
+      <div className="login-divider"><span>or</span></div><a className="social-button" href={`/affiliates/api/affiliate/session/social?return_to=${socialReturn}`}>Login with Social</a>
+    </div></section><aside className="login-art"><p>PARTNER NETWORK</p><h2>Your audience.<br/><em>Shared momentum.</em></h2><div className="art-stat"><strong>One account</strong><span>shared securely across Gathos dashboards</span></div></aside></main>;
 }
 
 export function AffiliatePortal() {

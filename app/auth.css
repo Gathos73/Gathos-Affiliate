@@ -1,0 +1,63 @@
+.login-tabs {
+  background: #f1efea;
+  border-radius: 9px;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: 1fr 1fr;
+  margin: 22px 0 4px;
+  padding: 3px;
+}
+
+.login-tabs button {
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  color: #77736c;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 9px;
+}
+
+.login-tabs button.active {
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+  color: #0a0a0a;
+}
+
+.login-divider {
+  align-items: center;
+  color: #9f9b93;
+  display: flex;
+  font-size: 10px;
+  gap: 12px;
+  margin: 20px 0;
+  text-transform: uppercase;
+}
+
+.login-divider::before,
+.login-divider::after {
+  background: #e3ded3;
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+
+.social-button {
+  align-items: center;
+  border: 1px solid #d9d4c9;
+  border-radius: 9px;
+  color: #0a0a0a;
+  display: flex;
+  font-weight: 750;
+  justify-content: center;
+  min-height: 42px;
+  text-decoration: none;
+}
+
+.social-button:hover {
+  background: #f7f6f3;
+}
+
+.login-card form > .primary {
+  width: 100%;
+}

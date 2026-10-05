@@ -1,6 +1,6 @@
 # Gathos Affiliate Dashboard
 
-Standalone Next.js portal for `affiliate.gathos.com`. It uses a same-origin BFF
+Standalone Next.js portal for `affiliate.gathos.live`. It uses a same-origin BFF
 under `/api/affiliate/*` and the backend's dedicated affiliate session cookie.
 
 ```bash
