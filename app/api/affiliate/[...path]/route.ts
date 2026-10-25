@@ -35,7 +35,7 @@ function upstreamPath(path: string[]): string {
 }
 
 function browserCookie(request: NextRequest, cookie: string): string {
-  // A .gathos.live cookie enables SSO on the custom domain. Vercel preview
+  // A .gathos.com cookie enables SSO on the custom domain. Vercel preview
   // hosts cannot accept that Domain attribute, so keep preview cookies local.
   return request.nextUrl.hostname.endsWith(".vercel.app")
     ? cookie.replace(/;\s*Domain=[^;]+/i, "")
